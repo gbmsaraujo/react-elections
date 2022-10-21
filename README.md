@@ -3,10 +3,10 @@ Desafio do módulo 02 do Bootcamp em React oferecido pela XP Educação.
 
 # Tecnologias Utilizadas
 
-`- React
- - TailWind
- - Node.js
-`
+- React
+- TailWind
+- Node.js
+- 
 # Como rodar o front? 
 
 - Ter o node na versão 14;
