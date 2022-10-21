@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function InfoElection({ city }) {
+export default function InfoElection({ city, candidateLength }) {
 	if(city) {
     const {name, votingPopulation, absence, presence} = city[0]
     return (
@@ -16,7 +16,7 @@ export default function InfoElection({ city }) {
         </div>
 
         <div className="w-full">
-          <p className="text-center"> 0 Candidates </p>
+          <p className="text-center"> {candidateLength} Candidates </p>
         </div>
 
       </section>

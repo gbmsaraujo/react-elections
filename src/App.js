@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import CardCandidate from "./components/CardCandidate";
 import CardsElection from "./components/CardsElection";
 import Header from "./components/Header";
 import InfoElection from "./components/InfoElection";
@@ -16,6 +17,7 @@ export default function App() {
 	const [selectedCity, setSelectedCity] = useState(null);
 	const [election, setElection] = useState([]);
 	const [candidatesByCity, setCandidatesByCity] = useState([]);
+	const [candidatesFiltered, setCandidatesFiltered] = useState([]);
 
 	useEffect(() => {
 		async function fetchDataBackend() {
@@ -28,7 +30,7 @@ export default function App() {
 				candidatesBackend.map((candidate) => {
 					return {
 						...candidate,
-						src: `./assets/img/${candidate.username}.png`
+						src: `/images/${candidate.username}.png`
 					};
 				})
 			);
@@ -41,36 +43,29 @@ export default function App() {
 		fetchDataBackend();
 	}, []);
 
-	/* useEffect(()=>{
-		const filterElection = election.filter((elect)=> elect.cityId === selectedCity.  )
-	},[selectedCity]) */
+	useEffect(() => {
+		const candidatesReduced = candidates.reduce((acc, curValue, index) => {
+			const candidate = candidatesByCity.find(
+				(candidate) => candidate.candidateId === curValue.id
+			);
+
+			return !candidate ? acc : sortVotes([...acc, { ...candidate, ...curValue }]);
+
+
+
+		}, []);
+
+		setCandidatesFiltered(candidatesReduced);
+	}, [selectedCity, candidates, candidatesByCity]);
 
 	function handleSelectCity(cityId) {
 		setSelectedCity(cities.filter((city) => city.id === cityId));
 		setCandidatesByCity(
-			sortVotes(election.filter((elect) => elect.cityId === cityId))
+			sortVotes(election.filter((elect, index) => elect.cityId === cityId))
 		);
 	}
 
-	function reduceCandidatesAndElection() {
-		if (candidates && election) {
-			const electionReduced = election.reduce((acc, curValue) => {
-				candidates.map((candidate) => {
-					if (candidate.id === curValue.candidateId) {
-						console.log(candidate.name)
-					}
-
-					return acc
-				});
-
-			}, []);
-
-			console.log(electionReduced)
-		}
-	}
-
-	reduceCandidatesAndElection();
-
+	console.log(selectedCity)
 	return (
 		<div>
 			<Header>React-Elections</Header>
@@ -78,9 +73,32 @@ export default function App() {
 				<SelectInput cities={cities} onSelectInput={handleSelectCity} />
 				<div className='container mx-auto p-4'>
 					<CardsElection>
-						{selectedCity && (
-							<InfoElection city={selectedCity}></InfoElection>
+						{selectedCity && candidatesByCity && (
+							<InfoElection
+								city={selectedCity}
+								candidateLength={candidatesByCity.length}
+							></InfoElection>
 						)}
+
+						<section className="flex flex-wrap flex-row gap-1 justify-center">
+						{candidatesFiltered &&
+							candidatesFiltered.map((candidate, index) => {
+								if(index === 0) {
+									candidate = {...candidate, elected: true}
+								}
+
+								return (
+									<CardCandidate
+										key={candidate.id}
+										src={candidate.src}
+										votes={candidate.votes}
+										totalVotes={selectedCity[0].presence}
+										name={candidate.name}
+										elected={candidate.elected}
+									/>
+								);
+							})}
+						</section>
 					</CardsElection>
 				</div>
 			</main>
